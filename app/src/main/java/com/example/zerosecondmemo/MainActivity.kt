@@ -1,6 +1,7 @@
 package com.example.zerosecondmemo
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
@@ -14,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contentEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var memoListView: ListView
+    private lateinit var viewAllButton: Button
     private lateinit var memoListAdapter: ArrayAdapter<String>
     private val memoList = ArrayList<String>()
 
@@ -26,6 +28,7 @@ class MainActivity : AppCompatActivity() {
         contentEditText = findViewById(R.id.contentEditText)
         saveButton = findViewById(R.id.saveButton)
         memoListView = findViewById(R.id.memoListView)
+        viewAllButton = findViewById(R.id.viewAllButton)
 
         // SharedPreferencesのインスタンスを取得
         val sharedPreferences = getSharedPreferences("ZeroSecondMemo", Context.MODE_PRIVATE)
@@ -36,8 +39,11 @@ class MainActivity : AppCompatActivity() {
             memoList.addAll(it)
         }
 
+        // 直近10件のメモのみを表示
+        val recentMemos = if (memoList.size > 10) memoList.takeLast(10) else memoList
+
         // リストアダプターの設定
-        memoListAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, memoList)
+        memoListAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, recentMemos)
         memoListView.adapter = memoListAdapter
 
         // 保存ボタンが押されたときの処理
@@ -59,7 +65,18 @@ class MainActivity : AppCompatActivity() {
                 // 入力フィールドをクリア
                 titleEditText.text.clear()
                 contentEditText.text.clear()
+
+                // リストを更新
+                memoListAdapter.clear()
+                val updatedRecentMemos = if (memoList.size > 10) memoList.takeLast(10) else memoList
+                memoListAdapter.addAll(updatedRecentMemos)
             }
+        }
+
+        // 全メモを表示する画面に遷移
+        viewAllButton.setOnClickListener {
+            val intent = Intent(this, FullListActivity::class.java)
+            startActivity(intent)
         }
     }
 }
