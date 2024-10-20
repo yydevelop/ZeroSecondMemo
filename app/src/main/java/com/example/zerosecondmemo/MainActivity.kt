@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -19,22 +21,24 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewAllButton: Button
     private lateinit var memoListAdapter: ArrayAdapter<Memo>
     private val memoList = ArrayList<Memo>()
+    private var editingIndex: Int? = null  // 編集中のメモのインデックス
+
+    // ActivityResultLauncherの定義
+    private lateinit var memoLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 各ビューの参照を取得
         titleEditText = findViewById(R.id.titleEditText)
         contentEditText = findViewById(R.id.contentEditText)
         saveButton = findViewById(R.id.saveButton)
         viewAllButton = findViewById(R.id.viewAllButton)
 
-        // SharedPreferencesのインスタンスを取得
+        // SharedPreferencesからメモを読み込む
         val sharedPreferences = getSharedPreferences("ZeroSecondMemo", Context.MODE_PRIVATE)
         val savedMemos = sharedPreferences.getStringSet("memos", null)
 
-        // 以前のメモを読み込み
         savedMemos?.let {
             for (memo in it) {
                 val parts = memo.split("|")
@@ -44,21 +48,44 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        // リストアダプターの設定
-        memoListAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, memoList)
+        // ActivityResultLauncherを登録
+        memoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK) {
+                val data = result.data
+                val title = data?.getStringExtra("title")
+                val content = data?.getStringExtra("content")
+                val index = data?.getIntExtra("index", -1)
 
-        // 保存ボタンが押されたときの処理
+                if (title != null && content != null && index != -1) {
+                    titleEditText.setText(title)
+                    contentEditText.setText(content)
+                    editingIndex = index  // 編集モードにする
+                }
+            }
+        }
+
+        // 全メモ表示画面に遷移
+        viewAllButton.setOnClickListener {
+            val intent = Intent(this, FullListActivity::class.java)
+            memoLauncher.launch(intent)  // 新しいAPIで起動
+        }
+
+        // メモを保存または編集
         saveButton.setOnClickListener {
             val title = titleEditText.text.toString()
             val content = contentEditText.text.toString()
-
-            // 現在の日時を取得
             val currentDateTime = SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault()).format(Date())
 
-            // タイトル、本文、日時をリストに登録
             if (title.isNotEmpty() && content.isNotEmpty()) {
-                val memo = Memo(title, content, currentDateTime)
-                memoList.add(memo)
+                if (editingIndex != null) {
+                    // 既存メモを更新
+                    memoList[editingIndex!!] = Memo(title, content, memoList[editingIndex!!].dateTime)
+                    editingIndex = null  // 編集終了
+                } else {
+                    // 新規メモを追加
+                    val memo = Memo(title, content, currentDateTime)
+                    memoList.add(memo)
+                }
 
                 // SharedPreferencesに保存
                 val editor = sharedPreferences.edit()
@@ -69,16 +96,7 @@ class MainActivity : AppCompatActivity() {
                 // 入力フィールドをクリア
                 titleEditText.text.clear()
                 contentEditText.text.clear()
-
-                // リストを更新
-                memoListAdapter.notifyDataSetChanged()
             }
-        }
-
-        // 全メモを表示する画面に遷移
-        viewAllButton.setOnClickListener {
-            val intent = Intent(this, FullListActivity::class.java)
-            startActivity(intent)
         }
     }
 }
