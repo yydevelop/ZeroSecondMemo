@@ -7,28 +7,65 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <!-- カウントダウン表示エリア -->
+    <TextView
+        android:id="@+id/countdownTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="残り時間: 60秒"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
+
+    <!-- ゼロ秒思考のポイント表示エリア -->
+    <TextView
+        android:id="@+id/zeroSecondThinkingTips"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="【ゼロ秒思考のポイント】\n・完璧を目指さず、とにかく書く\n・1分以内に1ページ\n・思いついたまま、どんどん書き出す"
+        android:textSize="14sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/countdownTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
+
     <!-- タイトル入力エリア -->
     <EditText
         android:id="@+id/titleEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="タイトルを入力"
-        app:layout_constraintTop_toTopOf="parent"
+        android:hint="タイトルを入力してください"
+        android:padding="12dp"
+        android:textSize="18sp"
+        android:background="@drawable/edittext_background"
+        android:textColor="@android:color/black"
+        android:gravity="start|center_vertical"
+        app:layout_constraintTop_toBottomOf="@id/zeroSecondThinkingTips"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp" />
 
     <!-- 本文入力エリア -->
     <EditText
         android:id="@+id/contentEditText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="本文を入力"
+        android:hint="本文を入力してください（1分以内に）"
+        android:padding="16dp"
+        android:textSize="16sp"
+        android:background="@drawable/edittext_background"
+        android:textColor="@android:color/black"
+        android:gravity="top|start"
+        android:minHeight="250dp"
         app:layout_constraintTop_toBottomOf="@+id/titleEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"
-        android:minHeight="150dp"/>
+        android:layout_margin="16dp" />
 
     <!-- 保存ボタン -->
     <Button
@@ -39,7 +76,7 @@
         app:layout_constraintTop_toBottomOf="@+id/contentEditText"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp"/>
+        android:layout_marginTop="16dp" />
 
     <!-- 全メモを表示ボタン -->
     <Button
@@ -50,6 +87,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_margin="16dp"/>
+        android:layout_margin="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -3,11 +3,13 @@ package com.example.zerosecondmemo
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.EditText
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -19,6 +21,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contentEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var viewAllButton: Button
+    private lateinit var countdownTextView: TextView  // カウントダウン表示用
+    private lateinit var memoListAdapter: ArrayAdapter<Memo>
     private val memoList = ArrayList<Memo>()
     private var editingIndex: Int? = null  // 編集中のメモのインデックス
 
@@ -33,6 +37,10 @@ class MainActivity : AppCompatActivity() {
         contentEditText = findViewById(R.id.contentEditText)
         saveButton = findViewById(R.id.saveButton)
         viewAllButton = findViewById(R.id.viewAllButton)
+        countdownTextView = findViewById(R.id.countdownTextView)
+
+        // カウントダウンタイマーを開始
+        startCountdownTimer()
 
         // SharedPreferencesからメモを読み込む
         val sharedPreferences = getSharedPreferences("ZeroSecondMemo", Context.MODE_PRIVATE)
@@ -66,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         // 全メモ表示画面に遷移
         viewAllButton.setOnClickListener {
             val intent = Intent(this, FullListActivity::class.java)
-            memoLauncher.launch(intent)  // 新しいAPIで起動
+            memoLauncher.launch(intent)  // FullListActivityを起動
         }
 
         // メモを保存または編集
@@ -77,11 +85,9 @@ class MainActivity : AppCompatActivity() {
 
             if (title.isNotEmpty() && content.isNotEmpty()) {
                 if (editingIndex != null) {
-                    // 既存メモを更新
                     memoList[editingIndex!!] = Memo(title, content, memoList[editingIndex!!].dateTime)
                     editingIndex = null  // 編集終了
                 } else {
-                    // 新規メモを追加
                     val memo = Memo(title, content, currentDateTime)
                     memoList.add(memo)
                 }
@@ -97,5 +103,18 @@ class MainActivity : AppCompatActivity() {
                 contentEditText.text.clear()
             }
         }
+    }
+
+    // カウントダウンタイマーの実装
+    private fun startCountdownTimer() {
+        object : CountDownTimer(60000, 1000) {  // 1分間（60,000ms）、1秒ごとに更新
+            override fun onTick(millisUntilFinished: Long) {
+                countdownTextView.text = "残り時間: ${millisUntilFinished / 1000}秒"  // 秒単位で表示
+            }
+
+            override fun onFinish() {
+                countdownTextView.text = "時間切れ！"
+            }
+        }.start()
     }
 }
