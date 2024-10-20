@@ -4,11 +4,13 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.ListView
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 
 class FullListActivity : AppCompatActivity() {
 
     private lateinit var memoListView: ListView
+    private lateinit var backToInputButton: Button
     private lateinit var memoListAdapter: ArrayAdapter<Memo>
     private val memoList = ArrayList<Memo>()
 
@@ -17,8 +19,9 @@ class FullListActivity : AppCompatActivity() {
         setContentView(R.layout.activity_full_list)
 
         memoListView = findViewById(R.id.fullMemoListView)
+        backToInputButton = findViewById(R.id.backToInputButton)
 
-        // メモリストを取得 (例: インテントから受け取るか、SharedPreferencesから取得)
+        // メモリストを取得 (例: SharedPreferencesから取得)
         val sharedPreferences = getSharedPreferences("ZeroSecondMemo", MODE_PRIVATE)
         val savedMemos = sharedPreferences.getStringSet("memos", null)
 
@@ -40,10 +43,16 @@ class FullListActivity : AppCompatActivity() {
             val resultIntent = Intent().apply {
                 putExtra("title", selectedMemo.title)
                 putExtra("content", selectedMemo.content)
-                putExtra("index", position)  // インデックスも返す
+                putExtra("index", position)
             }
             setResult(RESULT_OK, resultIntent)
             finish()  // メイン画面に戻る
+        }
+
+        // 入力画面に戻るボタン
+        backToInputButton.setOnClickListener {
+            val intent = Intent(this, MainActivity::class.java)
+            startActivity(intent)
         }
     }
 }
