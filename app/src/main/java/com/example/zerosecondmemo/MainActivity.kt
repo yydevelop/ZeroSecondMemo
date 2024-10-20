@@ -19,7 +19,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contentEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var viewAllButton: Button
-    private lateinit var memoListAdapter: ArrayAdapter<Memo>
     private val memoList = ArrayList<Memo>()
     private var editingIndex: Int? = null  // 編集中のメモのインデックス
 
