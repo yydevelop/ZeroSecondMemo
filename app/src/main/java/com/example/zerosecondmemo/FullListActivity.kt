@@ -6,12 +6,14 @@ import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 class FullListActivity : AppCompatActivity() {
 
     private lateinit var memoListView: ListView
     private lateinit var backToInputButton: Button
-    private lateinit var memoListAdapter: ArrayAdapter<Memo>
+    private lateinit var memoListAdapter: ArrayAdapter<String>
     private val memoList = ArrayList<Memo>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +23,7 @@ class FullListActivity : AppCompatActivity() {
         memoListView = findViewById(R.id.fullMemoListView)
         backToInputButton = findViewById(R.id.backToInputButton)
 
-        // メモリストを取得 (例: SharedPreferencesから取得)
+        // SharedPreferencesからメモリストを取得
         val sharedPreferences = getSharedPreferences("ZeroSecondMemo", MODE_PRIVATE)
         val savedMemos = sharedPreferences.getStringSet("memos", null)
 
@@ -29,12 +31,18 @@ class FullListActivity : AppCompatActivity() {
             for (memo in it) {
                 val parts = memo.split("|")
                 if (parts.size == 3) {
-                    memoList.add(Memo(parts[0], parts[1], parts[2]))
+                    memoList.add(Memo(parts[0], parts[1], parts[2]))  // タイトル, 本文, 日付
                 }
             }
         }
 
-        memoListAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, memoList)
+        // メモを日付の降順でソート
+        memoList.sortByDescending { SimpleDateFormat("yyyy/MM/dd HH:mm:ss", Locale.getDefault()).parse(it.dateTime) }
+
+        // リストに表示するために文字列のリストに変換
+        val memoStrings = memoList.map { "${it.dateTime} - ${it.title}" }
+
+        memoListAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, memoStrings)
         memoListView.adapter = memoListAdapter
 
         // メモをクリックしたときにメイン画面にメモを返す処理

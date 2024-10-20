@@ -21,7 +21,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var contentEditText: EditText
     private lateinit var saveButton: Button
     private lateinit var viewAllButton: Button
-    private lateinit var countdownTextView: TextView  // カウントダウン表示用
+    private lateinit var countdownTextView: TextView
+    private lateinit var memoCountTextView: TextView  // 今日のメモ数表示用
     private lateinit var memoListAdapter: ArrayAdapter<Memo>
     private val memoList = ArrayList<Memo>()
     private var editingIndex: Int? = null  // 編集中のメモのインデックス
@@ -38,6 +39,7 @@ class MainActivity : AppCompatActivity() {
         saveButton = findViewById(R.id.saveButton)
         viewAllButton = findViewById(R.id.viewAllButton)
         countdownTextView = findViewById(R.id.countdownTextView)
+        memoCountTextView = findViewById(R.id.memoCountTextView)
 
         // カウントダウンタイマーを開始
         startCountdownTimer()
@@ -54,6 +56,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // 今日のメモ数を表示
+        updateMemoCount()
 
         // ActivityResultLauncherを登録
         memoLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -101,6 +106,10 @@ class MainActivity : AppCompatActivity() {
                 // 入力フィールドをクリア
                 titleEditText.text.clear()
                 contentEditText.text.clear()
+
+                // 保存後、リスト画面に遷移
+                val intent = Intent(this, FullListActivity::class.java)
+                startActivity(intent)
             }
         }
     }
@@ -116,5 +125,13 @@ class MainActivity : AppCompatActivity() {
                 countdownTextView.text = "時間切れ！"
             }
         }.start()
+    }
+
+    // 今日のメモ数をカウントして更新
+    private fun updateMemoCount() {
+        val today = SimpleDateFormat("yyyy/MM/dd", Locale.getDefault()).format(Date())
+        val todayMemos = memoList.filter { it.dateTime.startsWith(today) }
+        val memoCount = todayMemos.size
+        memoCountTextView.text = "今日のメモ数: $memoCount (目標: 10ページ)"
     }
 }

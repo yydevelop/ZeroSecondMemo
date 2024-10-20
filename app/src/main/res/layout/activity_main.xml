@@ -20,6 +20,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="16dp" />
 
+    <!-- 日ごとのメモ数を表示するエリア -->
+    <TextView
+        android:id="@+id/memoCountTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="今日書いたメモ: 0ページ (10ページが目標)"
+        android:textSize="16sp"
+        android:textColor="@android:color/black"
+        app:layout_constraintTop_toBottomOf="@id/countdownTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" />
+
     <!-- ゼロ秒思考のポイント表示エリア -->
     <TextView
         android:id="@+id/zeroSecondThinkingTips"
@@ -29,7 +42,7 @@
         android:textSize="14sp"
         android:textColor="@android:color/black"
         android:gravity="center"
-        app:layout_constraintTop_toBottomOf="@id/countdownTextView"
+        app:layout_constraintTop_toBottomOf="@id/memoCountTextView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_margin="16dp" />
